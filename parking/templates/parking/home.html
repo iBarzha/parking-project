@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parking</title>
+</head>
+<body>
+    <h1>Parking Spaces</h1>
+    <ul>
+        {% for spot in parking_spots %}
+            <li>
+                Place №{{ spot.number }} - {% if spot.is_available %}available{% else %}engaged{% endif %}
+                {% if spot.is_available %}
+                    <a href="{% url 'book_parking_spot' spot.id %}">Make a reservation</a>
+                {% else %}
+                    Inaccessible
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

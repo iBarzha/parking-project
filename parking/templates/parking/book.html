@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservation of a place</title>
+</head>
+<body>
+    <h1>Reservation of a place №{{ parking_spot.number }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="start_time">Start of booking:</label>
+        <input type="datetime-local" name="start_time" required><br>
+        <label for="end_time">End of booking:</label>
+        <input type="datetime-local" name="end_time" required><br>
+        <button type="submit">Make a reservation</button>
+    </form>
+</body>
+</html>
