@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservation history</title>
+</head>
+<body>
+    <h1>My reservations</h1>
+    <ul>
+        {% for reservation in reservations %}
+            <li>
+                Place №{{ reservation.parking_spot.number }}: {{ reservation.start_time }} - {{ reservation.end_time }}
+                <br>Cost: {{ reservation.total_price }} $.
+            </li>
+        {% empty %}
+            <p>You don't have any reservations yet.</p>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'home' %}">Return to home</a>
+</body>
+</html>

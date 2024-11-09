@@ -35,3 +35,7 @@ def book_parking_spot(request, spot_id):
 
 def reservation_success(request):
     return render(request, 'parking/reservation_success.html')
+
+def reservation_history(request):
+    reservations = Reservation.objects.filter(user=request.user).order_by('-start_time')
+    return render(request, 'parking/reservation_history.html', {'reservations': reservations})
