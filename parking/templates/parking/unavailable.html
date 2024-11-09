@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inaccessible place</title>
+</head>
+<body>
+    <h1>Place №{{ parking_spot.number }} not available for reservation</h1>
+    <p>Sorry, the selected place has already been reserved by another user.</p>
+    <a href="{% url 'home' %}">Return to parking spaces</a>
+</body>
+</html>
