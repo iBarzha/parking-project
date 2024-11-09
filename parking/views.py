@@ -3,8 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import ParkingSpot, Reservation
 
+def update_parking_spots():
+    expired_reservations = Reservation.objects.filter(end_time__lt=timezone.now())
+    for reservation in expired_reservations:
+        reservation.parking_spot.is_available = True
+        reservation.parking_spot.save()
+        reservation.delete()
 
 def home(request):
+    update_parking_spots()
     parking_spots = ParkingSpot.objects.all()
     return render(request, 'parking/home.html', {'parking_spots': parking_spots})
 
@@ -12,6 +19,9 @@ def home(request):
 @login_required
 def book_parking_spot(request, spot_id):
     parking_spot = get_object_or_404(ParkingSpot, id=spot_id)
+
+    if not parking_spot.is_available:
+        return render(request, 'parking/unavailable.html', {'parking_spot': parking_spot})
 
     if request.method == 'POST':
         start_time = request.POST.get('start_time')

@@ -2,23 +2,39 @@
 <html>
 <head>
     <title>Parking</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function updateParkingSpots() {
+            $.ajax({
+                url: "{% url 'home' %}",
+                success: function(data) {
+                    $('#parking-spots').html($(data).find('#parking-spots').html());
+                }
+            });
+        }
+
+        setInterval(updateParkingSpots, 10000);
+    </script>
 </head>
 <body>
     <h1>Parking Spaces</h1>
     {% if user.is_authenticated %}
         <a href="{% url 'reservation_history' %}">My reservation history</a>
     {% endif %}
-    <ul>
-        {% for spot in parking_spots %}
-            <li>
-                Place №{{ spot.number }} - {% if spot.is_available %}available{% else %}engaged{% endif %}
-                {% if spot.is_available %}
-                    <a href="{% url 'book_parking_spot' spot.id %}">Make a reservation</a>
-                {% else %}
-                    Inaccessible
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+
+    <div id="parking-spots">
+        <ul>
+            {% for spot in parking_spots %}
+                <li>
+                    Place №{{ spot.number }} - {% if spot.is_available %}available{% else %}engaged{% endif %}
+                    {% if spot.is_available %}
+                        <a href="{% url 'book_parking_spot' spot.id %}">Make a reservation</a>
+                    {% else %}
+                        Inaccessible
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
