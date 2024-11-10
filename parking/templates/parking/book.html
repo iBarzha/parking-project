@@ -2,15 +2,55 @@
 <html>
 <head>
     <title>Reservation of a place</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function calculatePrice() {
+            var date = $('#date').val();
+            var startHour = $('#start_hour').val();
+            var endHour = $('#end_hour').val();
+
+            if (date && startHour && endHour) {
+                $.ajax({
+                    url: "{% url 'calculate_price' parking_spot.id %}",
+                    method: "POST",
+                    data: {
+                        'date': date,
+                        'start_hour': startHour,
+                        'end_hour': endHour,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.total_price) {
+                            $('#total_price').text('Cost: ' + response.total_price.toFixed(2) + ' $.');
+                        }
+                    },
+                    error: function() {
+                        $('#total_price').text('Cost calculation error');
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function() {
+            $('#date, #start_hour, #end_hour').on('change', calculatePrice);
+        });
+    </script>
 </head>
 <body>
     <h1>Reservation of a place №{{ parking_spot.number }}</h1>
-    <form method="POST">
+     <form method="POST">
         {% csrf_token %}
-        <label for="start_time">Start of booking:</label>
-        <input type="datetime-local" name="start_time" required><br>
-        <label for="end_time">End of booking:</label>
-        <input type="datetime-local" name="end_time" required><br>
+        <label for="date">Reservation date:</label>
+        <input type="date" name="date" id="date" required><br>
+
+        <label for="start_hour">Start of reservation (hour):</label>
+        <input type="number" name="start_hour" id="start_hour" min="0" max="23" required><br>
+
+        <label for="end_hour">End of reservation (hour):</label>
+        <input type="number" name="end_hour" id="end_hour" min="1" max="24" required><br>
+
+        <p id="total_price">Cost: — $.</p>
         <button type="submit">Make a reservation</button>
     </form>
 </body>
