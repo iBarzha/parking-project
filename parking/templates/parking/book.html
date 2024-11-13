@@ -1,58 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Reservation of a place</title>
+    <meta charset="UTF-8">
+    <title>Book Parking Spot</title>
+    {% load static %}
     <link href="{% static 'parking/css/styles.css' %}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        function calculatePrice() {
-            var date = $('#date').val();
-            var startHour = $('#start_hour').val();
-            var endHour = $('#end_hour').val();
-
-            if (date && startHour && endHour) {
-                $.ajax({
-                    url: "{% url 'calculate_price' parking_spot.id %}",
-                    method: "POST",
-                    data: {
-                        'date': date,
-                        'start_hour': startHour,
-                        'end_hour': endHour,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        if (response.total_price) {
-                            $('#total_price').text('Cost: ' + response.total_price.toFixed(2) + ' $.');
-                        }
-                    },
-                    error: function() {
-                        $('#total_price').text('Cost calculation error');
-                    }
-                });
-            }
-        }
-
-        $(document).ready(function() {
-            $('#date, #start_hour, #end_hour').on('change', calculatePrice);
-        });
-    </script>
 </head>
-<body>
-    <h1>Reservation of a place №{{ parking_spot.number }}</h1>
-     <form method="POST">
-        {% csrf_token %}
-        <label for="date">Reservation date:</label>
-        <input type="date" name="date" id="date" required><br>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-4">Reservation for Parking Spot #{{ parking_spot.number }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="date" class="block text-gray-700 mb-1">Reservation Date:</label>
+            <input type="date" id="date" name="date" required class="w-full border border-gray-300 rounded p-2 mb-4">
 
-        <label for="start_hour">Start of reservation (hour):</label>
-        <input type="number" name="start_hour" id="start_hour" min="0" max="23" required><br>
+            <label for="start_hour" class="block text-gray-700 mb-1">Start Time (Hour):</label>
+            <input type="number" id="start_hour" name="start_hour" min="0" max="23" required class="w-full border border-gray-300 rounded p-2 mb-4">
 
-        <label for="end_hour">End of reservation (hour):</label>
-        <input type="number" name="end_hour" id="end_hour" min="1" max="24" required><br>
+            <label for="end_hour" class="block text-gray-700 mb-1">End Time (Hour):</label>
+            <input type="number" id="end_hour" name="end_hour" min="1" max="24" required class="w-full border border-gray-300 rounded p-2 mb-4">
 
-        <p id="total_price">Cost: — $.</p>
-        <button type="submit">Make a reservation</button>
-    </form>
+            <p id="total_price" class="text-lg font-semibold text-blue-600 mt-4 mb-6">Total Price: — USD</p>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Book Now</button>
+        </form>
+    </div>
 </body>
 </html>

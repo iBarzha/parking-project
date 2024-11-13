@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Inaccessible place</title>
+    <meta charset="UTF-8">
+    <title>Reservation Success</title>
+    {% load static %}
+    <link href="{% static 'parking/css/styles.css' %}" rel="stylesheet">
 </head>
-<body>
-    <h1>Place №{{ parking_spot.number }} not available for reservation</h1>
-    <p>Sorry, the selected place has already been reserved by another user.</p>
-    <a href="{% url 'home' %}">Return to parking spaces</a>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-4">Reservation Successful!</h1>
+        <p class="text-gray-600">Your parking spot has been successfully reserved. Please check your reservation history for details.</p>
+        <a href="{% url 'reservation_history' %}" class="mt-4 inline-block bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+            View Reservation History
+        </a>
+    </div>
 </body>
 </html>

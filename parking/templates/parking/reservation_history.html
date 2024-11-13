@@ -1,20 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Reservation history</title>
+    <meta charset="UTF-8">
+    <title>Reservation History</title>
+    {% load static %}
+    <link href="{% static 'parking/css/styles.css' %}" rel="stylesheet">
 </head>
-<body>
-    <h1>My reservations</h1>
-    <ul>
-        {% for reservation in reservations %}
-            <li>
-                Place №{{ reservation.parking_spot.number }}: {{ reservation.start_time }} - {{ reservation.end_time }}
-                <br>Cost: {{ reservation.total_price }} $.
-            </li>
-        {% empty %}
-            <p>You don't have any reservations yet.</p>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'home' %}">Return to home</a>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Your Reservation History</h1>
+        <table class="min-w-full table-auto">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 text-gray-800">Spot Number</th>
+                    <th class="px-4 py-2 text-gray-800">Reservation Date</th>
+                    <th class="px-4 py-2 text-gray-800">Start Time</th>
+                    <th class="px-4 py-2 text-gray-800">End Time</th>
+                    <th class="px-4 py-2 text-gray-800">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td class="border px-4 py-2">{{ reservation.parking_spot.number }}</td>
+                    <td class="border px-4 py-2">{{ reservation.date }}</td>
+                    <td class="border px-4 py-2">{{ reservation.start_time }}</td>
+                    <td class="border px-4 py-2">{{ reservation.end_time }}</td>
+                    <td class="border px-4 py-2">{{ reservation.total_price }} USD</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
