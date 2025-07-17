@@ -2,24 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Parking Spots</title>
+    <title>Smart Parking System</title>
     {% load static %}
     <link href="{% static 'parking/css/styles.css' %}" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Available Parking Spots</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">🚗 Smart Parking System</h1>
+                <nav class="space-x-4">
+                    <a href="{% url 'home' %}" class="hover:underline">Home</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'reservation_history' %}" class="hover:underline">My Reservations</a>
+                        <span class="text-blue-200">Hello, {{ user.username }}!</span>
+                        <a href="{% url 'admin:logout' %}" class="hover:underline">Logout</a>
+                    {% else %}
+                        <a href="{% url 'admin:login' %}" class="hover:underline">Login</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Available Parking Spots</h2>
+            <p class="text-gray-600 mb-6">Choose from our available parking spots. Real-time pricing and instant booking!</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Available Spots</p>
+                        <p class="text-2xl font-semibold text-gray-700">{{ available_count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-100 rounded-full">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Occupied Spots</p>
+                        <p class="text-2xl font-semibold text-gray-700">{{ occupied_count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 0h4a2 2 0 002-2v-2M7 13h10v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Total Spots</p>
+                        <p class="text-2xl font-semibold text-gray-700">{{ total_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Spots Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {% for spot in parking_spots %}
-            <div class="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow">
-                <h2 class="text-xl font-semibold text-gray-700">Spot #{{ spot.number }}</h2>
-                <p class="text-gray-600">Price per Hour: {{ spot.price_per_hour }} USD</p>
-                <a href="{% url 'book_parking_spot' spot.id %}" class="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                    Book Now
-                </a>
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <!-- Status Badge -->
+                <div class="relative">
+                    <div class="absolute top-3 right-3 z-10">
+                        {% if spot.is_available %}
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Available</span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Occupied</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Spot Visual -->
+                    <div class="{% if spot.is_available %}bg-green-50{% else %}bg-red-50{% endif %} p-6 text-center">
+                        <div class="{% if spot.is_available %}text-green-600{% else %}text-red-600{% endif %} text-4xl mb-2">
+                            {% if spot.is_available %}🚗{% else %}🚙{% endif %}
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Spot #{{ spot.number }}</h2>
+                    </div>
+                </div>
+                
+                <!-- Spot Details -->
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-600">Price per Hour</span>
+                        <span class="text-2xl font-bold text-blue-600">${{ spot.price_per_hour }}</span>
+                    </div>
+                    
+                    <!-- Spot Type Badge -->
+                    <div class="mb-4">
+                        {% if spot.price_per_hour >= 15 %}
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">VIP</span>
+                        {% elif spot.price_per_hour >= 10 %}
+                            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Premium</span>
+                        {% elif spot.price_per_hour >= 7 %}
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Standard</span>
+                        {% else %}
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Economy</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Book Button -->
+                    {% if spot.is_available %}
+                        <a href="{% url 'book_parking_spot' spot.id %}" 
+                           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 inline-flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Book Now
+                        </a>
+                    {% else %}
+                        <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                            Currently Occupied
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <div class="text-gray-400 text-6xl mb-4">🚫</div>
+                <p class="text-gray-600 text-lg">No parking spots available at the moment.</p>
             </div>
             {% endfor %}
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 Smart Parking System. All rights reserved.</p>
+                <p class="text-gray-400 mt-2">Efficient parking management for modern cities.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

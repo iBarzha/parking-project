@@ -25,5 +25,43 @@
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Book Now</button>
         </form>
     </div>
+
+    <script>
+        function calculatePrice() {
+            const date = document.getElementById('date').value;
+            const startHour = document.getElementById('start_hour').value;
+            const endHour = document.getElementById('end_hour').value;
+            
+            if (date && startHour && endHour) {
+                const formData = new FormData();
+                formData.append('date', date);
+                formData.append('start_hour', startHour);
+                formData.append('end_hour', endHour);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                
+                fetch('{% url "calculate_price" parking_spot.id %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.total_price) {
+                        document.getElementById('total_price').textContent = `Total Price: $${data.total_price.toFixed(2)} USD`;
+                    } else if (data.error) {
+                        document.getElementById('total_price').textContent = `Error: ${data.error}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('total_price').textContent = 'Error calculating price';
+                });
+            }
+        }
+        
+        // Add event listeners for real-time price calculation
+        document.getElementById('date').addEventListener('change', calculatePrice);
+        document.getElementById('start_hour').addEventListener('input', calculatePrice);
+        document.getElementById('end_hour').addEventListener('input', calculatePrice);
+    </script>
 </body>
 </html>

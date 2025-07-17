@@ -16,7 +16,20 @@ def update_parking_spots():
 def home(request):
     update_parking_spots()
     parking_spots = ParkingSpot.objects.all()
-    return render(request, 'parking/home.html', {'parking_spots': parking_spots})
+    
+    # Calculate statistics
+    available_count = parking_spots.filter(is_available=True).count()
+    occupied_count = parking_spots.filter(is_available=False).count()
+    total_count = parking_spots.count()
+    
+    context = {
+        'parking_spots': parking_spots,
+        'available_count': available_count,
+        'occupied_count': occupied_count,
+        'total_count': total_count,
+    }
+    
+    return render(request, 'parking/home.html', context)
 
 
 @login_required
